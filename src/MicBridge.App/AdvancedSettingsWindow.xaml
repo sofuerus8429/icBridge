@@ -1,0 +1,144 @@
+<Window x:Class="MicBridge.App.AdvancedSettingsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="clr-namespace:MicBridge.App.Controls"
+        Title="高级设置 · MicBridge" Style="{StaticResource {x:Type Window}}" Width="860" Height="740" MinWidth="720" MinHeight="600"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+    <Window.Resources><BooleanToVisibilityConverter x:Key="BoolVisibility"/></Window.Resources>
+    <Grid Margin="24">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <StackPanel Margin="0,0,0,18">
+            <TextBlock Text="高级设置" FontSize="24" FontWeight="SemiBold"/>
+            <TextBlock Text="设备选项需先停止混音；音量、增益和静音可实时调整。" Style="{StaticResource Hint}" Margin="0,6,0,0"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,6,0">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <Expander x:Name="DeviceSection" IsExpanded="True" Foreground="{StaticResource Text}">
+                        <Expander.Header><TextBlock Text="设备与连接" FontSize="16" FontWeight="SemiBold"/></Expander.Header>
+                        <StackPanel Margin="0,14,0,0">
+                            <CheckBox Content="使用声卡立体声混音（免装额外虚拟驱动）" IsChecked="{Binding HardwareLoopbackMode}" IsEnabled="{Binding IsStopped}"/>
+                            <StackPanel Visibility="{Binding HardwareLoopbackMode, Converter={StaticResource BoolVisibility}}" Margin="0,8,0,14">
+                                <TextBlock Text="游戏中使用的录音设备" Style="{StaticResource Hint}"/>
+                                <ComboBox ItemsSource="{Binding HardwareCaptureDevices}" SelectedItem="{Binding HardwareCaptureDevice}" IsEnabled="{Binding IsStopped}" Margin="0,6,0,0" AutomationProperties.Name="声卡立体声混音"/>
+                                <TextBlock Text="{Binding HardwareRouteHint}" Style="{StaticResource Hint}" Margin="0,8,0,0"/>
+                                <TextBlock Text="该声卡上的所有声音都会录入，可能包含游戏声和音乐程序直出的声音。需要独立调音时，请把游戏、音乐程序的播放移到另一块声卡；不要开启 Windows ‘侦听此设备’。" Style="{StaticResource Hint}" Margin="0,6,0,0"/>
+                                <Button Content="打开录音设备" Command="{Binding OpenRecordingDevicesCommand}" HorizontalAlignment="Left" Padding="12,7" Margin="0,8,0,0"/>
+                                <Button Content="检测并选择可用输出" Command="{Binding DetectHardwareOutputCommand}" HorizontalAlignment="Left" Padding="12,7" Margin="0,8,0,0"/>
+                                <Button Content="取消检测" Command="{Binding CancelHardwareDetectionCommand}" Visibility="{Binding IsDetectingHardware, Converter={StaticResource BoolVisibility}}" HorizontalAlignment="Left" Padding="12,7" Margin="0,8,0,0"/>
+                            </StackPanel>
+                            <TextBlock Text="输出设备" Style="{StaticResource Hint}"/>
+                            <CheckBox Content="显示其他输出设备（多通道 / 普通扬声器）" IsChecked="{Binding ShowOtherOutputDevices}" IsEnabled="{Binding IsStopped}" Visibility="{Binding IsVirtualOutputMode, Converter={StaticResource BoolVisibility}}" Margin="0,6,0,0"/>
+                            <ComboBox ItemsSource="{Binding OutputDevices}" SelectedItem="{Binding OutputDevice}" IsEnabled="{Binding IsStopped}" Margin="0,6,0,0" AutomationProperties.Name="输出设备"/>
+                            <TextBlock Text="{Binding OutputHint}" Style="{StaticResource Hint}" Margin="0,7,0,14"/>
+                            <TextBlock Text="原麦克风" Style="{StaticResource Hint}"/>
+                            <ComboBox ItemsSource="{Binding MicrophoneDevices}" SelectedItem="{Binding MicrophoneDevice}" IsEnabled="{Binding IsStopped}" Margin="0,6,0,14" AutomationProperties.Name="原麦克风设备"/>
+                            <TextBlock Text="音频格式" Style="{StaticResource Hint}"/>
+                            <TextBlock Text="{Binding AudioFormatText}" Margin="0,6,0,14"/>
+                            <TextBlock Text="程序采集模式" Style="{StaticResource Hint}"/>
+                            <ComboBox ItemsSource="{Binding CaptureModes}" SelectedIndex="{Binding CaptureMode}" IsEnabled="{Binding IsStopped}" Margin="0,6,0,8" AutomationProperties.Name="程序采集模式"/>
+                            <Grid Visibility="{Binding IsProcessMode, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding SelectedProcessText}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <Button Grid.Column="1" Content="选择进程" Command="{Binding SelectProcessCommand}" Padding="12,7"/>
+                            </Grid>
+                            <StackPanel Visibility="{Binding IsDeviceMode, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,12">
+                                <ComboBox ItemsSource="{Binding LoopbackDevices}" SelectedItem="{Binding LoopbackDevice}" IsEnabled="{Binding IsStopped}" AutomationProperties.Name="兼容采集设备"/>
+                                <TextBlock Text="兼容模式采集这个设备的全部声音。采集、输出和监听须使用不同设备。" Style="{StaticResource Hint}" Margin="0,6,0,0"/>
+                            </StackPanel>
+                            <Grid Margin="0,6,0,12">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition/><ColumnDefinition Width="65"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="输出缓冲" Style="{StaticResource Hint}" VerticalAlignment="Center"/>
+                                <Slider Grid.Column="1" Minimum="20" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding Latency}" IsEnabled="{Binding IsStopped}" AutomationProperties.Name="输出缓冲"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Latency, StringFormat={}{0} ms}" TextAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                            <CheckBox Content="开启耳机监听" IsChecked="{Binding MonitorEnabled}" IsEnabled="{Binding IsStopped}"/>
+                            <ComboBox ItemsSource="{Binding MonitorDevices}" SelectedItem="{Binding MonitorDevice}" IsEnabled="{Binding IsStopped}" Margin="0,6,0,0" AutomationProperties.Name="监听设备"/>
+                            <Grid Margin="0,8,0,12">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition/><ColumnDefinition Width="65"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="监听音量" Style="{StaticResource Hint}" VerticalAlignment="Center"/>
+                                <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding MonitorVolume}" AutomationProperties.Name="监听音量"/>
+                                <TextBlock Grid.Column="2" Text="{Binding MonitorVolume, StringFormat={}{0:0}%}" TextAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="刷新设备" Command="{Binding RefreshCommand}" Padding="12,7"/>
+                                <Button Content="虚拟线缆官网" Command="{Binding DriverGuideCommand}" Padding="12,7" Margin="8,0"/>
+                                <Button Content="Windows 声音设置" Command="{Binding OpenAudioSettingsCommand}" Padding="12,7"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding VirtualDeviceStatus}" Style="{StaticResource Hint}" Margin="0,10,0,0"/>
+                            <TextBlock Text="{Binding CableReminder}" Style="{StaticResource Hint}" Margin="0,4,0,0"/>
+                            <Button Content="开源许可" Click="OnLicenses" HorizontalAlignment="Left" Padding="12,7" Margin="0,12,0,0"/>
+                            <Button Content="安装虚拟麦克风" Command="{Binding InstallDriverCommand}" HorizontalAlignment="Left" Padding="12,7" Margin="0,8,0,0"/>
+                            <Button Content="卸载与清理" Command="{Binding UninstallCommand}" HorizontalAlignment="Left" Padding="12,7" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Expander>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <Expander x:Name="MixSection" Foreground="{StaticResource Text}">
+                        <Expander.Header><TextBlock Text="混音细节" FontSize="16" FontWeight="SemiBold"/></Expander.Header>
+                        <StackPanel Margin="0,14,0,0">
+                            <TextBlock Text="主界面推子与这里的通道音量同步。GAIN 将推子上限扩展至 300%；dB 增益用于进一步校准。" Style="{StaticResource Hint}" Margin="0,0,0,14"/>
+                            <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="音乐 / 人声交叉混音" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Column="1" Text="{Binding MixBalanceText}" Foreground="{StaticResource Muted}"/>
+                            </Grid>
+                            <Slider Minimum="0" Maximum="100" Value="{Binding MixBalance}" AutomationProperties.Name="音乐与人声混音比例" Margin="0,8,0,0"/>
+                            <TextBlock Text="中点保留两路完整音量；两端只保留音乐或人声。" Style="{StaticResource Hint}" Margin="0,3,0,16"/>
+                            <TextBlock Text="本地音乐" FontWeight="SemiBold"/>
+                            <controls:ChannelStrip DataContext="{Binding Music}" Margin="0,0,0,14"/>
+                            <TextBlock Text="程序声音" FontWeight="SemiBold"/>
+                            <controls:ChannelStrip DataContext="{Binding ApplicationChannel}" Margin="0,0,0,14"/>
+                            <TextBlock Text="原麦克风" FontWeight="SemiBold"/>
+                            <controls:ChannelStrip DataContext="{Binding Microphone}" Margin="0,0,0,14"/>
+                            <TextBlock Text="总输出" FontWeight="SemiBold"/>
+                            <controls:ChannelStrip DataContext="{Binding Master}"/>
+                            <TextBlock Text="{Binding LimiterText}" Style="{StaticResource Hint}" Margin="0,7,0,0"/>
+                        </StackPanel>
+                    </Expander>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <Expander x:Name="ProcessingSection" Foreground="{StaticResource Text}">
+                        <Expander.Header><TextBlock Text="麦克风处理" FontSize="16" FontWeight="SemiBold"/></Expander.Header>
+                        <StackPanel Margin="0,14,0,0">
+                            <CheckBox Content="80 Hz 高通滤波 · 减轻低频轰鸣" IsChecked="{Binding MicrophoneHighPassEnabled}"/>
+                            <CheckBox Content="静音门 · 压低说话间隙的底噪" IsChecked="{Binding MicrophoneGateEnabled}" Margin="0,12,0,0"/>
+                            <Grid Margin="0,10,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="90"/><ColumnDefinition/><ColumnDefinition Width="85"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="开启门限" Style="{StaticResource Hint}" VerticalAlignment="Center"/>
+                                <Slider Grid.Column="1" Minimum="-80" Maximum="-20" Value="{Binding MicrophoneGateThreshold}" AutomationProperties.Name="静音门门限"/>
+                                <TextBlock Grid.Column="2" Text="{Binding MicrophoneGateThreshold, StringFormat={}{0:0} dBFS}" TextAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock Text="静音门会在输入低于门限后平滑衰减；门限过高可能截断轻声。它不消除说话期间的背景噪声。" Style="{StaticResource Hint}" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Expander>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <Expander x:Name="PlaylistSection" Foreground="{StaticResource Text}">
+                        <Expander.Header><TextBlock Text="本地播放列表" FontSize="16" FontWeight="SemiBold"/></Expander.Header>
+                        <StackPanel Margin="0,14,0,0">
+                            <ListBox ItemsSource="{Binding Playlist}" SelectedItem="{Binding SelectedTrack}" Height="140" MouseDoubleClick="OnTrackDoubleClick" AutomationProperties.Name="播放列表">
+                                <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/></DataTemplate></ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,12">
+                                <Button Content="添加音乐" Command="{Binding AddFilesCommand}" Padding="12,7"/>
+                                <Button Content="移除" Command="{Binding RemoveTrackCommand}" Padding="12,7" Margin="8,0,16,0"/>
+                                <CheckBox Content="单曲循环" IsChecked="{Binding Loop}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="上一首" Command="{Binding PreviousCommand}" Padding="12,7"/>
+                                <Button Content="{Binding TransportText}" Command="{Binding PlayCommand}" Padding="20,7" Margin="8,0"/>
+                                <Button Content="下一首" Command="{Binding NextCommand}" Padding="12,7"/>
+                                <Button Content="停止歌曲" Command="{Binding StopTrackCommand}" Padding="12,7" Margin="8,0,0,0"/>
+                            </StackPanel>
+                            <CheckBox Content="把本地音乐加入混音" IsChecked="{Binding Music.Enabled}" Margin="0,12,0,4"/>
+                            <TextBlock Text="双击歌曲可播放。未开启循环时，会按列表顺序播放。" Style="{StaticResource Hint}"/>
+                        </StackPanel>
+                    </Expander>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding ConnectionText}" Foreground="{StaticResource Accent}"/><TextBlock Text="{Binding VersionText}" Foreground="{StaticResource Muted}" FontSize="10" Margin="0,4,0,0"/></StackPanel>
+            <Button Grid.Column="1" Content="{Binding StartText}" Command="{Binding StartCommand}" Margin="0,0,8,0"/>
+            <Button Grid.Column="2" Content="完成" Style="{StaticResource PrimaryButton}" IsDefault="True" IsCancel="True" Click="OnDone" Padding="20,9"/>
+        </Grid>
+    </Grid>
+</Window>

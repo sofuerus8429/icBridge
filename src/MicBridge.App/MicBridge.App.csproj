@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MicBridge.Audio\MicBridge.Audio.csproj" />
+    <EmbeddedResource Include="../../LICENSE" LogicalName="MicBridge.Notices.ProjectLicense" />
+    <EmbeddedResource Include="../../THIRD_PARTY_NOTICES.md" LogicalName="MicBridge.Notices.ThirdParty" />
+    <EmbeddedResource Include="../../assets/drivers/vb-cable/VBCABLE_Driver_Pack45.zip" LogicalName="MicBridge.Drivers.VbCablePack45" />
+    <EmbeddedResource Include="../../assets/drivers/vb-cable/NOTICE.md" LogicalName="MicBridge.Notices.VbCable" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(PublishSingleFile)' == 'true' And '$(SelfContained)' == 'true'">
+    <EmbeddedResource Include="$(NuGetPackageRoot)microsoft.netcore.app.runtime.$(RuntimeIdentifier)/$(RuntimeFrameworkVersion)/LICENSE.TXT" LogicalName="MicBridge.Notices.DotnetLicense" />
+    <EmbeddedResource Include="$(NuGetPackageRoot)microsoft.netcore.app.runtime.$(RuntimeIdentifier)/$(RuntimeFrameworkVersion)/THIRD-PARTY-NOTICES.TXT" LogicalName="MicBridge.Notices.DotnetThirdParty" />
+    <EmbeddedResource Include="$(NuGetPackageRoot)microsoft.windowsdesktop.app.runtime.$(RuntimeIdentifier)/$(RuntimeFrameworkVersion)/LICENSE" LogicalName="MicBridge.Notices.DesktopLicense" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>MicBridge</AssemblyName>
+    <ApplicationIcon>../../assets/branding/micbridge.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Shared/FrameworkCompilerSupport.cs" Link="Compatibility/FrameworkCompilerSupport.cs" />
+    <Resource Include="../../assets/branding/micbridge.ico" Link="Assets/micbridge.ico" />
+    <Resource Include="../../assets/branding/micbridge.png" Link="Assets/micbridge.png" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Fody" Version="6.9.3" PrivateAssets="all" />
+    <PackageReference Include="Costura.Fody" Version="6.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

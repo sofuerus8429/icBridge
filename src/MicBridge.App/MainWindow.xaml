@@ -1,0 +1,94 @@
+<Window x:Class="MicBridge.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="clr-namespace:MicBridge.App.Controls"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="MicBridge 音桥 · 调音台" Icon="Assets/micbridge.ico" Style="{StaticResource {x:Type Window}}" Width="1060" Height="790" MinWidth="900" MinHeight="690"
+        WindowStyle="None" Background="Transparent" WindowStartupLocation="CenterScreen" AllowDrop="True" Drop="OnFilesDropped" DragOver="OnDragOver">
+    <shell:WindowChrome.WindowChrome><shell:WindowChrome CaptionHeight="62" ResizeBorderThickness="6" GlassFrameThickness="-1" CornerRadius="22" UseAeroCaptionButtons="False"/></shell:WindowChrome.WindowChrome>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVisibility"/>
+        <DataTemplate x:Key="DeviceName"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}"/></DataTemplate>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding AddFilesCommand}"/>
+        <KeyBinding Key="M" Modifiers="Control" Command="{Binding MuteAllCommand}"/>
+    </Window.InputBindings>
+    <Border x:Name="WindowSurface" Background="#ED111114" BorderBrush="#40FFFFFF" BorderThickness="1" CornerRadius="22" Margin="6">
+        <Grid>
+            <Grid.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#12FFFFFF" Offset="0"/><GradientStop Color="#00FFFFFF" Offset="0.55"/><GradientStop Color="#06FFFFFF" Offset="1"/></LinearGradientBrush></Grid.Background>
+            <Grid.RowDefinitions><RowDefinition Height="70"/><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid Margin="27,0,18,0">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="Assets/micbridge.png" Width="42" Height="42" Margin="0,0,13,0"/>
+                    <StackPanel VerticalAlignment="Center"><TextBlock Text="音桥" FontSize="21" FontWeight="SemiBold"/><TextBlock Text="MICBRIDGE" FontSize="9" Foreground="{StaticResource Muted}" Margin="1,2,0,0"/></StackPanel>
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="你的声音现场" Foreground="{StaticResource Muted}" FontSize="12" Margin="25,0,0,0" VerticalAlignment="Center"/>
+                <Button Grid.Column="2" Content="高级设置" Command="{Binding AdvancedSettingsCommand}" Padding="15,8" VerticalAlignment="Center" shell:WindowChrome.IsHitTestVisibleInChrome="True"/>
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button Content="−" Width="34" Padding="0,7" Click="OnMinimize" ToolTip="最小化" AutomationProperties.Name="最小化"/>
+                    <Button Content="□" Width="34" Padding="0,7" Margin="4,0" Click="OnMaximize" ToolTip="最大化 / 还原" AutomationProperties.Name="最大化或还原"/>
+                    <Button Content="×" Width="34" Padding="0,7" Click="OnClose" ToolTip="关闭" AutomationProperties.Name="关闭"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1" Margin="27,2,27,18">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="16"/><ColumnDefinition/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <Border CornerRadius="15" Background="#0BFFFFFF" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="16,14">
+                    <StackPanel>
+                        <TextBlock Text="01   原麦克风" Foreground="{StaticResource Muted}" FontSize="11" Margin="0,0,0,11"/>
+                        <ComboBox ItemsSource="{Binding MicrophoneDevices}" SelectedItem="{Binding MicrophoneDevice}" IsEnabled="{Binding IsStopped}" ItemTemplate="{StaticResource DeviceName}" AutomationProperties.Name="原麦克风"/>
+                        <TextBlock Text="人声输入" Foreground="{StaticResource Muted}" FontSize="10" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" CornerRadius="15" Background="#0BFFFFFF" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="16,14">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,9"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="02   音乐来源" Foreground="{StaticResource Muted}" FontSize="11" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" CornerRadius="7" Background="#38000000" Padding="2"><StackPanel Orientation="Horizontal" IsEnabled="{Binding CanChangeSource}">
+                                <RadioButton Content="本地" GroupName="Source" Style="{StaticResource SegmentedChoice}" IsChecked="{Binding IsLocalSource, Mode=OneWay}" Command="{Binding ChooseLocalCommand}"/>
+                                <RadioButton Content="进程" GroupName="Source" Style="{StaticResource SegmentedChoice}" IsChecked="{Binding IsApplicationSource, Mode=OneWay}" Command="{Binding ChooseApplicationCommand}"/>
+                            </StackPanel></Border>
+                        </Grid>
+                        <Button Command="{Binding ChooseSourceCommand}" Padding="11,9" ToolTip="{Binding SourceTitle}" AutomationProperties.Name="选择音乐来源">
+                            <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding SourceTitle}" TextTrimming="CharacterEllipsis" MaxWidth="190" HorizontalAlignment="Left"/>
+                                <TextBlock Grid.Column="1" Text="＋" Margin="9,0,0,0"/>
+                            </Grid>
+                        </Button>
+                        <TextBlock Text="{Binding SourceSubtitle}" Foreground="{StaticResource Muted}" FontSize="10" Margin="0,10,0,0" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="4" CornerRadius="15" Background="#0BFFFFFF" BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="16,14">
+                    <StackPanel>
+                        <TextBlock Text="{Binding OutputCaption}" Foreground="{StaticResource Muted}" FontSize="11" Margin="0,0,0,11"/>
+                        <ComboBox ItemsSource="{Binding OutputDevices}" SelectedItem="{Binding OutputDevice}" IsEnabled="{Binding IsStopped}" ItemTemplate="{StaticResource DeviceName}" AutomationProperties.Name="音量输出设备"/>
+                        <TextBlock Text="{Binding CableReminder}" Foreground="{StaticResource Muted}" FontSize="10" Margin="0,10,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="2" Margin="27,0,27,18">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="16"/><ColumnDefinition/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <controls:ConsoleChannelStrip Title="原麦克风" Subtitle="MICROPHONE · INPUT" DataContext="{Binding Microphone}"/>
+                <controls:ConsoleChannelStrip Grid.Column="2" Title="音乐 / 进程" Subtitle="MUSIC SOURCE · INPUT" DataContext="{Binding SourceChannel}"/>
+                <controls:ConsoleChannelStrip Grid.Column="4" Title="总输出" Subtitle="VIRTUAL MICROPHONE · OUTPUT" IsOutput="True" DataContext="{Binding Master}"/>
+            </Grid>
+            <Border Grid.Row="3" BorderBrush="#20FFFFFF" BorderThickness="0,1,0,0" Padding="27,15,27,19">
+                <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="{Binding PlaybackStatus}" FontSize="12"/>
+                        <TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" Foreground="{StaticResource Muted}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,7,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Width="230" Margin="0,0,20,0" VerticalAlignment="Center">
+                        <Grid Visibility="{Binding IsLocalSource, Converter={StaticResource BoolVisibility}}"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding TimeText}" FontSize="10" Foreground="{StaticResource Muted}" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Content="{Binding SourcePlayText}" Command="{Binding SourcePlayCommand}" FontSize="11" Padding="11,6" AutomationProperties.Name="本地播放或暂停"/>
+                        </Grid>
+                        <Slider Minimum="0" Maximum="{Binding SeekMaximum}" Value="{Binding SeekSeconds}" IsEnabled="{Binding HasTrack}" Visibility="{Binding IsLocalSource, Converter={StaticResource BoolVisibility}}"
+                                PreviewMouseDown="OnSeekStarted" PreviewMouseUp="OnSeekEnded" LostMouseCapture="OnSeekEnded" AutomationProperties.Name="播放进度"/>
+                        <TextBlock Text="进程声音随原程序播放" Foreground="{StaticResource Muted}" FontSize="11" Visibility="{Binding IsApplicationSource, Converter={StaticResource BoolVisibility}}" Margin="0,14,0,14" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="{Binding StartText}" Command="{Binding StartCommand}" Style="{StaticResource PrimaryButton}" Padding="24,13" MinWidth="127" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

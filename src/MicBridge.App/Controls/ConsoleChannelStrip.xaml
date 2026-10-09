@@ -1,0 +1,28 @@
+<UserControl x:Class="MicBridge.App.Controls.ConsoleChannelStrip" x:Name="Root" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:MicBridge.App.Controls">
+    <Border CornerRadius="20" BorderBrush="#28FFFFFF" BorderThickness="1" Padding="23,18">
+        <Border.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#18FFFFFF"/><GradientStop Color="#08FFFFFF" Offset="0.55"/><GradientStop Color="#10FFFFFF" Offset="1"/></LinearGradientBrush></Border.Background>
+        <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*" MinHeight="85"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel><TextBlock Text="{Binding Title, ElementName=Root}" FontSize="19" FontWeight="SemiBold"/><TextBlock Text="{Binding Subtitle, ElementName=Root}" FontSize="9" Foreground="{StaticResource Muted}" Margin="0,6,0,0"/></StackPanel>
+                <CheckBox Grid.Column="1" Content="启用" IsChecked="{Binding Enabled}" FontSize="11" VerticalAlignment="Top" AutomationProperties.Name="启用混音通道"/>
+            </Grid>
+            <Grid Grid.Row="1" Margin="0,4,0,16"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="输出电平" FontSize="10" Foreground="{StaticResource Muted}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Level}" FontSize="11" Foreground="#D0D0D5" VerticalAlignment="Center"/>
+            </Grid>
+            <Grid Grid.Row="2" HorizontalAlignment="Center" Width="204" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="36"/><ColumnDefinition Width="12"/><ColumnDefinition Width="62"/><ColumnDefinition Width="28"/><ColumnDefinition Width="18"/><ColumnDefinition Width="10"/><ColumnDefinition Width="38"/></Grid.ColumnDefinitions>
+                <local:FaderScale Maximum="{Binding VolumeMaximum}"/>
+                <Slider Grid.Column="2" Style="{StaticResource MixerFader}" Minimum="0" Maximum="{Binding VolumeMaximum}" Value="{Binding Volume, Mode=TwoWay}" AutomationProperties.Name="竖向音量推子"/>
+                <local:VerticalLevelMeter Grid.Column="4" Value="{Binding Meter, Mode=OneWay}" Margin="0,15" AutomationProperties.Name="从下向上跳动的电平灯柱"/>
+                <local:DecibelScale Grid.Column="6" Margin="0,15"/>
+            </Grid>
+            <StackPanel Grid.Row="3" HorizontalAlignment="Center" Margin="0,0,0,12">
+                <TextBlock Text="{Binding VolumeText}" FontSize="30" FontWeight="Light" HorizontalAlignment="Center"/>
+                <CheckBox Content="GAIN · 最高 300%" IsChecked="{Binding GainMode}" FontSize="10" Foreground="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,6,0,0" AutomationProperties.Name="开启百分比增益模式"/>
+            </StackPanel>
+            <CheckBox Grid.Row="4" Content="静音" IsChecked="{Binding Muted}" Style="{StaticResource CapsuleToggle}" HorizontalAlignment="Stretch" AutomationProperties.Name="通道静音"/>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,32 @@
+name: Windows build
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.317'
+      - name: Select verified SDK
+        shell: pwsh
+        run: |
+          dotnet new globaljson --sdk-version 9.0.317 --roll-forward disable --force --no-update-check
+          dotnet --info
+      - name: Build with locked dependencies
+        shell: pwsh
+        run: ./scripts/build.ps1
+      - name: Audio behavior tests
+        shell: pwsh
+        run: ./scripts/test.ps1
+      - name: Publish lightweight single executable
+        shell: pwsh
+        run: ./scripts/publish-single-file.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MicBridge-win-x64
+          path: dist/*/*

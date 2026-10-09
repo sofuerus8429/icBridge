@@ -1,0 +1,37 @@
+<Window x:Class="MicBridge.App.UninstallWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="卸载与清理 · MicBridge"
+        Style="{StaticResource {x:Type Window}}" Width="660" Height="600" MinWidth="580" MinHeight="540"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Closing="OnClosing">
+    <Grid Margin="28">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock Text="卸载与清理" FontSize="24" FontWeight="SemiBold"/>
+            <TextBlock Text="选择要移除的内容。请先关闭其他音桥窗口。" Style="{StaticResource Hint}" Margin="0,8,0,20"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <CheckBox x:Name="DriverCheckBox" Content="卸载 VB-CABLE 虚拟音频驱动" IsEnabled="False" Click="OnSelectionChanged"/>
+                        <TextBlock Text="调用内置的 VB-Audio 官方工具，需要管理员批准。请在官方窗口点击 Remove Driver，并按提示重启。" Style="{StaticResource Hint}" Margin="0,10,0,0"/>
+                        <TextBlock Text="VB-CABLE 是系统共享的音频驱动。卸载后，其他使用 CABLE Input / Output 的程序也会失去该设备。" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                        <TextBlock x:Name="DriverStatus" Text="正在检查驱动…" Style="{StaticResource Hint}" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <CheckBox x:Name="SettingsCheckBox" Content="清除音桥设置和错误日志" Click="OnSelectionChanged"/>
+                        <TextBlock Text="删除已保存的设备选择、音量和播放列表记录；歌曲文件会保留。" Style="{StaticResource Hint}" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+                <TextBlock Text="音桥本体是便携程序。完成后关闭音桥，删除 MicBridge.exe 和卸载入口即可移除软件文件。" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                <TextBlock x:Name="RemovalStatus" Text="未选择任何操作。" Style="{StaticResource Hint}" Margin="0,0,0,12"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Margin="0,18,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <Button x:Name="CloseButton" Grid.Column="1" Content="关闭" IsCancel="True" Click="OnClose" Padding="18,9" Margin="0,0,8,0"/>
+            <Button x:Name="RemoveButton" Grid.Column="2" Content="开始卸载" Style="{StaticResource PrimaryButton}" Click="OnRemove" IsEnabled="False" Padding="18,9"/>
+        </Grid>
+    </Grid>
+</Window>

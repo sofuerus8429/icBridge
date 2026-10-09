@@ -1,0 +1,32 @@
+<Window x:Class="MicBridge.App.DriverSetupWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="虚拟麦克风 · MicBridge"
+        Style="{StaticResource {x:Type Window}}" Width="620" Height="550" MinWidth="560" MinHeight="520"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Closing="OnClosing">
+    <Grid Margin="28">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock Text="准备虚拟麦克风" FontSize="24" FontWeight="SemiBold"/>
+            <TextBlock Text="驱动已包含在音桥里，无需另外下载。" Style="{StaticResource Hint}" Margin="0,8,0,20"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="VB-CABLE · VB-Audio Software" FontSize="16" FontWeight="SemiBold"/>
+                        <TextBlock Text="安装后，音桥输出选 CABLE Input，游戏麦克风选 CABLE Output。请保持这两个设备启用，尤其不要禁用 CABLE Output，否则游戏会找不到虚拟麦克风。" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                        <TextBlock Text="VB-CABLE 是 Donationware，欢迎捐赠或购买许可支持作者。此驱动保留官方名称和原始许可。" Style="{StaticResource Hint}" Margin="0,12,0,0"/>
+                        <TextBlock Margin="0,10,0,0"><Hyperlink NavigateUri="https://vb-audio.com/Cable/" RequestNavigate="OnNavigate">VB-Audio 官网与捐赠</Hyperlink></TextBlock>
+                        <Button Content="查看驱动原始许可" Click="OnLicense" HorizontalAlignment="Left" Padding="12,7" Margin="0,12,0,0"/>
+                    </StackPanel>
+                </Border>
+                <TextBlock Text="点击安装后，请批准 Windows 的管理员权限请求，并在官方安装器中点击 Install Driver。按安装器提示重启电脑。安装驱动会注册系统音频设备及相关注册表项。" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                <TextBlock x:Name="SetupStatus" Text="仅首次使用需要安装。已有虚拟麦克风时会跳过。" Style="{StaticResource Hint}" Margin="0,0,0,12"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Margin="0,18,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <Button x:Name="LaterButton" Grid.Column="1" Content="稍后" IsCancel="True" Click="OnLater" Padding="18,9" Margin="0,0,8,0"/>
+            <Button x:Name="InstallButton" Grid.Column="2" Content="安装虚拟麦克风" Style="{StaticResource PrimaryButton}" Click="OnInstall" Padding="18,9"/>
+        </Grid>
+    </Grid>
+</Window>
